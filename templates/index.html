@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% set title = "Dashboard" %}
+
+{% block content %}
+  <section class="hero">
+    <div>
+      <h2>Financial performance at a glance</h2>
+      <p>
+        Track the rental fleet, customer base, and active contracts while applying
+        year-based pricing, rental-period discounts, loyalty benefits, and penalties
+        for poor return conditions.
+      </p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <p class="stat-label">Cars in fleet</p>
+        <p class="stat-value">{{ totals.cars }}</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Registered customers</p>
+        <p class="stat-value">{{ totals.customers }}</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Total rentals</p>
+        <p class="stat-value">{{ totals.rentals }}</p>
+      </div>
+      <div class="stat-card accent">
+        <p class="stat-label">Revenue (last 5 returns)</p>
+        <p class="stat-value">{{ "%.2f"|format(revenue) }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h3>Recent activity</h3>
+      <p>Latest rentals are tracked with expected return dates and condition checks.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Car</th>
+            <th>Customer</th>
+            <th>Issued</th>
+            <th>Expected return</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rental in recent_rentals %}
+            <tr>
+              <td>#{{ rental.id }}</td>
+              <td>{{ rental.make }} ({{ rental.type }})</td>
+              <td>{{ rental.last_name }} {{ rental.first_name }}</td>
+              <td>{{ rental.date_issue }}</td>
+              <td>{{ rental.expected_return_date }}</td>
+              <td>
+                {% if rental.actual_return_date %}
+                  Returned
+                {% else %}
+                  Active
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" class="empty">No rentals yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}
