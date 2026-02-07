@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% set title = "Cars Issued" %}
+
+{% block content %}
+  <section class="panel split">
+    <div>
+      <h3>Issue a car</h3>
+      <p>Record each customer request with issue and expected return dates.</p>
+      <form method="post" class="form-grid" data-rental-form>
+        <label>
+          Car
+          <select name="car_id" required>
+            <option value="">Select available car</option>
+            {% for car in cars %}
+              <option value="{{ car.id }}">
+                {{ car.make }} ({{ car.type }}) - {{ car.year }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          Customer
+          <select name="customer_id" required>
+            <option value="">Select customer</option>
+            {% for customer in customers %}
+              <option value="{{ customer.id }}">
+                {{ customer.last_name }} {{ customer.first_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          Date of issue
+          <input name="date_issue" type="date" value="{{ today }}" required />
+        </label>
+        <label>
+          Expected return date
+          <input name="expected_return_date" type="date" required />
+        </label>
+        <button type="submit">Create rental</button>
+        <p class="form-hint">Available cars update after return is recorded.</p>
+      </form>
+    </div>
+    <div class="tip-card">
+      <h4>Cost calculation</h4>
+      <ul>
+        <li>Base rate comes from the car rental cost per day.</li>
+        <li>Year factor reduces price for older vehicles.</li>
+        <li>Rental-period discount applies to longer bookings.</li>
+        <li>Loyalty discount applies to frequent customers.</li>
+        <li>Poor condition adds a 20% penalty.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h3>Issued cars</h3>
+      <p>Track active and completed rentals with calculated totals.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Car</th>
+            <th>Customer</th>
+            <th>Issue</th>
+            <th>End date</th>
+            <th>Days</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rental in rentals %}
+            <tr>
+              <td>#{{ rental.id }}</td>
+              <td>{{ rental.make }} ({{ rental.type }})</td>
+              <td>{{ rental.last_name }} {{ rental.first_name }}</td>
+              <td>{{ rental.date_issue }}</td>
+              <td>{{ rental.end_date }}</td>
+              <td>{{ rental.days }}</td>
+              <td>{{ "%.2f"|format(rental.cost.total) }}</td>
+              <td>
+                {% if rental.actual_return_date %}
+                  Returned
+                {% else %}
+                  Active
+                {% endif %}
+              </td>
+            </tr>
+            <tr class="detail-row">
+              <td colspan="8">
+                <div class="detail">
+                  <div>
+                    <p class="detail-title">Pricing breakdown</p>
+                    <p class="detail-line">
+                      Base daily: {{ "%.2f"|format(rental.cost.base_daily) }} -
+                      Year factor: {{ "%.2f"|format(rental.cost.year_factor) }} -
+                      Period factor: {{ "%.2f"|format(rental.cost.period_factor) }} -
+                      Loyalty factor: {{ "%.2f"|format(rental.cost.loyalty_factor) }}
+                    </p>
+                    <p class="detail-line">
+                      Subtotal: {{ "%.2f"|format(rental.cost.subtotal) }} -
+                      Penalty: {{ "%.2f"|format(rental.cost.penalty) }}
+                    </p>
+                  </div>
+                  {% if not rental.actual_return_date %}
+                    <form
+                      method="post"
+                      action="{{ url_for('return_rental', rental_id=rental.id) }}"
+                      class="return-form"
+                    >
+                      <label>
+                        Actual return date
+                        <input name="actual_return_date" type="date" value="{{ today }}" required />
+                      </label>
+                      <label>
+                        Condition
+                        <select name="return_condition">
+                          <option value="good">Good</option>
+                          <option value="poor">Poor</option>
+                        </select>
+                      </label>
+                      <button type="submit">Close rental</button>
+                    </form>
+                  {% else %}
+                    <p class="detail-line">Returned in {{ rental.return_condition or "good" }} condition.</p>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8" class="empty">No rentals recorded yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

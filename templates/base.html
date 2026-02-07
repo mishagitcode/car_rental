@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title or "Car Rental Office" }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=DM+Serif+Display&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Automation of a commercial car rental service</p>
+          <h1>Car Rental Office</h1>
+        </div>
+        <nav class="nav">
+          <a href="{{ url_for('index') }}">Dashboard</a>
+          <a href="{{ url_for('cars') }}">Cars</a>
+          <a href="{{ url_for('customers') }}">Customers</a>
+          <a href="{{ url_for('rentals') }}">Cars issued</a>
+        </nav>
+      </header>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <section class="flash">
+            {% for message in messages %}
+              <div class="flash-card">{{ message }}</div>
+            {% endfor %}
+          </section>
+        {% endif %}
+      {% endwith %}
+
+      <main>
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

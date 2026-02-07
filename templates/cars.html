@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% set title = "Cars" %}
+
+{% block content %}
+  <section class="panel split">
+    <div>
+      <h3>Add a car to the fleet</h3>
+      <p>Capture the make, year, rental rate, and segment type for pricing.</p>
+      <form method="post" class="form-grid">
+        <label>
+          Make
+          <input name="make" required />
+        </label>
+        <label>
+          Year of manufacture
+          <input name="year" type="number" min="1970" max="2100" required />
+        </label>
+        <label>
+          Purchase cost
+          <input name="cost" type="number" step="0.01" min="0" required />
+        </label>
+        <label>
+          Base rental cost (per day)
+          <input name="rental_cost" type="number" step="0.01" min="0" required />
+        </label>
+        <label>
+          Type
+          <input name="type" placeholder="SUV, Sedan, Van..." required />
+        </label>
+        <button type="submit">Save car</button>
+      </form>
+    </div>
+    <div class="tip-card">
+      <h4>Pricing logic</h4>
+      <ul>
+        <li>Older cars receive a year-based reduction (up to 30%).</li>
+        <li>Longer rentals earn a period discount.</li>
+        <li>Regular customers unlock loyalty savings.</li>
+        <li>Poor return condition adds a penalty surcharge.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h3>Fleet inventory</h3>
+      <p>Track each vehicle's base pricing before adjustments.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Make</th>
+            <th>Year</th>
+            <th>Cost</th>
+            <th>Rental cost/day</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for car in cars %}
+            <tr>
+              <td>#{{ car.id }}</td>
+              <td>{{ car.make }}</td>
+              <td>{{ car.year }}</td>
+              <td>{{ "%.2f"|format(car.cost) }}</td>
+              <td>{{ "%.2f"|format(car.rental_cost) }}</td>
+              <td>{{ car.type }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" class="empty">No cars in the fleet yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}
